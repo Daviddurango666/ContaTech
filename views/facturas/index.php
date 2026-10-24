@@ -1,0 +1,116 @@
+<?php
+require __DIR__ . '/../layouts/auth_check.php';
+
+if (!RolePermissions::can($currentUser['rol'], 'facturas', 'read')) {
+    header('Location: /ContaTech1/views/dashboard/index.php'); exit;
+}
+
+$pageTitle = 'Facturación';
+$currentRoute = 'facturas';
+
+require __DIR__ . '/../layouts/header.php';
+require __DIR__ . '/../layouts/sidebar.php';
+
+$canCreate = RolePermissions::can($currentUser['rol'], 'facturas', 'create');
+$canProcess = RolePermissions::can($currentUser['rol'], 'facturas', 'process');
+$canDian = RolePermissions::can($currentUser['rol'], 'facturas', 'dian');
+
+?>
+<main class="main-content">
+    <div class="header">
+        <h1>Facturación Electrónica (DIAN)</h1>
+    </div>
+    <div class="toolbar">
+        <span>Generar desde orden de venta · Contabilizar · Enviar DIAN</span>
+        <?php if ($canCreate): ?>
+            <button class="btn btn-primary" onclick="generar()">+ Generar factura desde orden</button>
+        <?php endif; ?>
+    </div>
+    <div class="table-wrap">
+        <table class="data" id="tbl">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>CUFE</th>
+                    <th>Contable</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script>
+const canProcess=<?= $canProcess?'true':'false' ?>, canDian=<?= $canDian?'true':'false' ?>;
+const fmt=n=>new Intl.NumberFormat(
+    'es-CO',{
+        style:'currency',
+        currency:'COP',
+        maximumFractionDigits:0
+    }).format(n||0);
+
+async function load(){
+  
+    const r=await ContaAPI.get('facturas');
+    document.querySelector('#tbl tbody').innerHTML=r.data.map(f=>`
+        <tr>
+            <td>${f.numero}</td>
+            <td>${f.cliente_nombre||'—'}</td>
+            <td>${fmt(f.total)}</td>
+            <td>
+                <span class="badge badge-${f.estado}">${f.estado}</span>
+            </td>
+            <td style="font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;">${f.cufe?f.cufe.slice(0,16)+'…':'—'}</td>
+            <td>${f.registro_contable==1?'Sí':'No'}</td>
+            <td>
+                <button class="btn btn-sm btn-secondary" onclick="ver(${f.id})">Ver</button>
+                ${canProcess && !f.registro_contable?`<button class="btn btn-sm btn-secondary" onclick="procesar(${f.id})">Contabilizar</button>`:''}
+                ${canDian && f.estado!=='enviada_dian'?`<button class="btn btn-sm btn-primary" onclick="dian(${f.id})">DIAN</button>`:''}
+            </td>
+            </tr>`
+        ).join('')||'<tr><td colspan="7" class="empty">Sin facturas</td></tr>';
+}
+
+async function generar(){
+    const ordenId=prompt('ID de la orden de venta a facturar:');
+    if(!ordenId){
+        return;
+    }
+    
+    try{
+        await ContaAPI.post('facturas/generar',{orden_id:+ordenId});
+        load();
+    }catch(e){
+        alert(e.message);
+    }
+}
+async function ver(id){
+    const r=await ContaAPI.get('facturas/'+id);
+    const f=r.data;
+    alert(`Factura ${f.numero}\nTotal: ${fmt(f.total)}\nEstado: ${f.estado}\nCUFE: ${f.cufe||'N/A'}`);
+}
+async function procesar(id){ 
+    await ContaAPI.post('facturas/'+id+'/procesar'); 
+    load(); 
+}
+
+async function dian(id){
+    if(!confirm('¿Enviar factura electrónica a DIAN?')){
+        return;
+    }
+    try{ 
+        await ContaAPI.post('facturas/'+id+'/dian'); 
+        alert('Enviada a DIAN'); 
+        load(); 
+    }catch(e){alert(e.message);}
+}
+
+load();
+
+</script>
+</body>
+</html>
