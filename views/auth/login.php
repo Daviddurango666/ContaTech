@@ -20,7 +20,30 @@ if (!empty($_COOKIE['contatech_token'])) {
         <link rel="stylesheet" href="<?= $base ?>/public/assets/css/login.css">
         <link rel="stylesheet" href="<?= $base ?>/public/assets/css/app.css">
         <script src="<?= $base ?>/public/assets/js/api.js"></script>
-        <style>.login-box .error{color:#dc2626;font-size:13px;margin-bottom:12px;display:none}.demo-users{margin-top:24px;font-size:12px;color:#666;text-align:left;max-width:320px;margin-left:auto;margin-right:auto}.demo-users code{background:#f0f0f0;padding:1px 5px;border-radius:4px}</style>
+        <style>
+            .login-box 
+            .error{
+                color:#dc2626;
+                font-size:13px;
+                margin-bottom:12px;
+                display:none
+            }
+                
+            .demo-users{
+                margin-top:24px;
+                font-size:12px;
+                color:#666;
+                text-align:left;
+                max-width:320px;
+                margin-left:auto;
+                margin-right:auto
+            }
+            .demo-users code{
+                background:#f0f0f0;
+                padding:1px 5px;
+                border-radius:4px
+            }
+        </style>
     </head>
 <body>
     <div class="login-container">

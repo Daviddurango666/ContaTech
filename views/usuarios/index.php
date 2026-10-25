@@ -89,7 +89,8 @@ $roles=$appCfg['roles'];
     const rolesMap=<?=json_encode($roles)?>;
     async function load(){
         const res=await ContaAPI.get('usuarios');
-        document.querySelector('#tbl tbody').innerHTML=res.data.map(u=>`
+        const lista = res.data.slice().sort((a, b) => a.id - b.id); // ASC por id
+        document.querySelector('#tbl tbody').innerHTML=lista.map(u=>`
             <tr>
                 <td>${u.id}</td>
                 <td>${u.nombre}</td>

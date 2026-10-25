@@ -11,7 +11,7 @@ class ProductModel extends Model {
                                 LEFT JOIN 
                                 categorias c ON c.id=p.categoria_id 
                                 ORDER BY 
-                                p.nombre"
+                                p.id ASC"
         )->fetchAll();
     }
     public function create(array $d): int {

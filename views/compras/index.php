@@ -1,7 +1,10 @@
 <?php
+
 require __DIR__ . '/../layouts/auth_check.php';
+
 if (!RolePermissions::can($currentUser['rol'], 'compras', 'read')) {
-		header('Location: /ContaTech/views/dashboard/index.php'); exit;
+		header('Location: /ContaTech1/views/dashboard/index.php'); 
+        exit;
 }
 $pageTitle = 'Compras';
 $currentRoute = 'compras';

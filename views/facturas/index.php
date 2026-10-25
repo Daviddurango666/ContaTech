@@ -56,7 +56,8 @@ const fmt=n=>new Intl.NumberFormat(
 async function load(){
   
     const r=await ContaAPI.get('facturas');
-    document.querySelector('#tbl tbody').innerHTML=r.data.map(f=>`
+    const lista = r.data.slice().sort((a, b) => a.numero - b.numero); // ASC por id
+    document.querySelector('#tbl tbody').innerHTML=lista.map(f=>`
         <tr>
             <td>${f.numero}</td>
             <td>${f.cliente_nombre||'—'}</td>

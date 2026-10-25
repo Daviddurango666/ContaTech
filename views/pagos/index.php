@@ -61,14 +61,15 @@ $canConc = RolePermissions::can($currentUser['rol'], 'pagos', 'conciliar');
 
 	async function load(){
 	const r=await ContaAPI.get('pagos');
-	document.querySelector('#tbl tbody').innerHTML=r.data.map(p=>`
+	const lista = r.data.slice().sort((a, b) => String(a.id).localeCompare(String(b.id), 'es', { numeric: true })); // ASC por id
+	document.querySelector('#tbl tbody').innerHTML=lista.map(p=>`
 		<tr>
-		<td>${p.id}</td>
-		<td>${p.metodo_nombre}</td>
-		<td>${fmt(p.monto)}</td>
-		<td>${p.factura_numero||'—'}</td>
-		<td><span class="badge badge-${p.estado}">${p.estado}</span></td>
-		<td style="font-size:11px;">${p.referencia||p.bold_payment_id||'—'}</td>
+			<td>${p.id}</td>
+			<td>${p.metodo_nombre}</td>
+			<td>${fmt(p.monto)}</td>
+			<td>${p.factura_numero||'—'}</td>
+			<td><span class="badge badge-${p.estado}">${p.estado}</span></td>
+			<td style="font-size:11px;">${p.referencia||p.bold_payment_id||'—'}</td>
 		<td>
 			${canConc && !p.conciliado?`<button class="btn btn-sm btn-secondary" onclick="conciliar(${p.id})">Conciliar</button>`:''}
 			${canBold && p.bold_payment_id && p.estado==='pendiente'?`<button class="btn btn-sm btn-primary" onclick="confirmBold(${p.id})">Confirmar Bold</button>`:''}

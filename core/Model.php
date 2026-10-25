@@ -12,7 +12,7 @@ abstract class Model {
         $this->db = Database::getInstance(); 
     }
     
-    public function findAll(string $orderBy = null): array {
+    public function findAll(string $orderBy): array {
         $sql = "
                 SELECT * FROM 
                 {$this->table}
@@ -40,8 +40,11 @@ abstract class Model {
         return $row ?: null;
     }
     public function delete($id): bool {
-        
-        return $this->db->prepare("DELETE FROM {$this->table} WHERE {$this->primaryKey} = ?")->execute([$id]);
+        return $this->db->prepare("
+                                     DELETE FROM {$this->table} 
+                                     WHERE 
+                                     {$this->primaryKey} = ?
+        ")->execute([$id]);
     
     }
 }

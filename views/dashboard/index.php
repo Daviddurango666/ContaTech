@@ -48,64 +48,84 @@ require __DIR__.'/../layouts/sidebar.php';
 
     <div class="chart-grid">
         <div class="chart-box">
-            <h3>Ingresos / Egresos</h3>
-            <canvas id="chartIE" height="100%"></canvas>
+            <h3>Egresos</h3>
+            <canvas id="chartEgresos" height="220"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>Ingresos</h3>
+            <canvas id="chartIngresos" height="220"></canvas>
         </div>
     </div>
-
 </main>
-
 <script>
-const fmt=n=>new Intl.NumberFormat(
-    'es-CO',{
-        style:'currency',
-        currency:'COP',
-        maximumFractionDigits:0
-    }).format(n||0);
+const fmt = n => new Intl.NumberFormat('es-CO', {
+    style: 'currency', currency: 'COP', maximumFractionDigits: 0
+}).format(n || 0);
 
-async function load(){ 
-    try{
-        const res=await ContaAPI.get('informes/dashboard'); 
-        const d=res.data;
-        kpiIngresos.textContent=fmt(d.ingresos); 
-        kpiEgresos.textContent=fmt(d.egresos); 
-        kpiSaldo.textContent=fmt(d.saldo);
-        kpiProd.textContent=d.productos; 
-        kpiLow.textContent=d.alertas_stock; 
-        kpiOV.textContent=d.ordenes_pendientes;
-
-        new Chart(document.getElementById('chartIE'),{
-            type:'bar',
-            data:{
-                labels:['Ingresos','Egresos'],
-                datasets:[
-                    {
-                        data:[d.ingresos,d.egresos],
-                        backgroundColor:['#16a34a','#dc2626']
-                    }
-                ]
-            },
-            options:{
-                responsive:true,
-                plugins:{
-                    legend:{
-                        display:false
-                    }
+function barOptions() {
+    return {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (ctx) => fmt(ctx.raw) } }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                callback: (v) => new Intl.NumberFormat('es-CO', {
+                notation: 'compact', maximumFractionDigits: 1
+                }).format(v)
                 },
-                scales:{
-                    y:{
-                        beginAtZero:true
-                    }
-                }
+                grid: { color: '#f0f0f0' }
+            },
+            x: { 
+                grid: { 
+                    display: false 
+                } 
             }
-        });
-    } catch(e){
-        console.error(e);
-    } 
+        }
+    };
 }
 
-load();
+function makeBarChart(canvasId, label, value, color) {
+    return new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: {
+            labels: [label],
+            datasets: [{
+                label: label,
+                data: [value],
+                backgroundColor: color,
+                borderWidth: 0,
+                borderRadius: 50,       // redondeo de la barra
+                borderSkipped: false,   // redondea también la base
+                maxBarThickness: 80
+            }]
+        },
+        options: barOptions()
+    });
+}
 
+async function load() {
+    try {
+        const res = await ContaAPI.get('informes/dashboard');
+        const d = res.data;
+
+        kpiIngresos.textContent = fmt(d.ingresos);
+        kpiEgresos.textContent = fmt(d.egresos);
+        kpiSaldo.textContent = fmt(d.saldo);
+        kpiProd.textContent = d.productos;
+        kpiLow.textContent = d.alertas_stock;
+        kpiOV.textContent = d.ordenes_pendientes;
+
+        makeBarChart('chartIngresos', 'Ingresos', d.ingresos, '#16a34a');
+        makeBarChart('chartEgresos', 'Egresos', d.egresos, '#dc2626');
+    } catch (e) {
+        console.error(e);
+    }
+}
+load();
 </script>
 </body>
 </html>

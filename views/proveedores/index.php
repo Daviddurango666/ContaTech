@@ -81,7 +81,21 @@ $canDelete=RolePermissions::can($currentUser['rol'],'proveedores','delete');
         const canUpdate=<?=$canUpdate?'true':'false'?>,canDelete=<?=$canDelete?'true':'false'?>;
         async function load(){
             const r=await ContaAPI.get('proveedores');
-            document.querySelector('#tbl tbody').innerHTML=r.data.map(p=>`<tr><td>${p.nit}</td><td>${p.razon_social}</td><td>${p.contacto||''}</td><td>${p.email||''}</td><td>${p.telefono||''}</td><td>${p.activo==1?'Activo':'Inactivo'}</td><td>${canUpdate?`<button class="btn btn-sm btn-secondary" onclick='edit(${JSON.stringify(p)})'>Editar</button>`:''}${canDelete?`<button class="btn btn-sm btn-danger" onclick="del(${p.id})">Eliminar</button>`:''}</td></tr>`).join('');
+            const lista = r.data.slice().sort((a, b) => String(a.nit).localeCompare(String(b.nit), 'es', { numeric: true })); // ASC por id
+            document.querySelector('#tbl tbody').innerHTML=lista.map(p=>`
+                <tr>
+                    <td>${p.nit}</td>
+                    <td>${p.razon_social}</td>
+                    <td>${p.contacto||''}</td>
+                    <td>${p.email||''}</td>
+                    <td>${p.telefono||''}</td>
+                    <td>${p.activo==1?'Activo':'Inactivo'}</td>
+                    <td>${canUpdate?`
+                            <button class="btn btn-sm btn-secondary" onclick='edit(${JSON.stringify(p)})'>Editar</button>`:''}
+                        ${canDelete?`
+                            <button class="btn btn-sm btn-danger" onclick="del(${p.id})">Eliminar</button>`:''}
+                    </td>
+                </tr>`).join('');
         }
         function openForm(){
             pid.value='';

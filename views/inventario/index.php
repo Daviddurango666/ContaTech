@@ -43,8 +43,8 @@ $canDelete=RolePermissions::can($currentUser['rol'],'inventario','delete');
         </table>
     </div>
     <div id="modalProd" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;">
-        <div class="form-card" style="margin:auto;">
-            <h2 style="margin-bottom:16px;">Producto</h2>
+        <div class="form-card" style="margin:auto; width: 400px;">
+            <h2 style="text-align:center;">Producto</h2>
             <input type="hidden" id="prid">
             <div class="form-group">
                 <label>Código</label>
@@ -86,8 +86,9 @@ $canDelete=RolePermissions::can($currentUser['rol'],'inventario','delete');
     const fmt=n=>new Intl.NumberFormat('es-CO').format(n);
     async function loadProducts(){
         const r=await ContaAPI.get('productos');
+        const lista = r.data.slice().sort((a, b) => String(a.codigo).localeCompare(String(b.codigo), 'es', { numeric: true })); // ASC por id
         document.querySelector('#tbl thead').innerHTML='<tr><th>Código</th><th>Nombre</th><th>Cat</th><th>Precio</th><th>Stock</th><th>Mín</th><th></th></tr>';
-        document.querySelector('#tbl tbody').innerHTML=r.data.map(p=>`
+        document.querySelector('#tbl tbody').innerHTML= lista.map(p=>`
         <tr style="${p.stock<=p.stock_minimo?'background:#fef2f2':''}">
             <td>${p.codigo}</td>
             <td>${p.nombre}</td>
@@ -108,13 +109,14 @@ $canDelete=RolePermissions::can($currentUser['rol'],'inventario','delete');
     }
     async function loadLow(){
         const r=await ContaAPI.get('productos/alertas');
+        const lista = r.data.slice().sort((a, b) => String(a.codigo).localeCompare(String(b.codigo), 'es', { numeric: true })); // ASC por id
         document.querySelector('#tbl thead').innerHTML='<tr><th>Código</th><th>Nombre</th><th>Stock</th><th>Mín</th></tr>';
-        document.querySelector('#tbl tbody').innerHTML=(r.data.length?r.data.map(p=>`
+        document.querySelector('#tbl tbody').innerHTML=(lista.length?lista.map(p=>`
             <tr>
-            <td>${p.codigo}</td>
-            <td>${p.nombre}</td>
-            <td>${p.stock}</td>
-            <td>${p.stock_minimo}</td>
+                <td>${p.codigo}</td>
+                <td>${p.nombre}</td>
+                <td>${p.stock}</td>
+                <td>${p.stock_minimo}</td>
             </tr>`).join(''):'<tr><td colspan="4" class="empty">Sin alertas</td></tr>');
         }
     function openProd(){
