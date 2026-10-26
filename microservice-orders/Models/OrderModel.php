@@ -103,15 +103,14 @@ class OrderModel extends Model {
 
     public function allWithRelations(): array {
         return $this->db->query("
-                                SELECT 
-                                o.*,
+                                SELECT o.*,
                                 c.nombre AS cliente_nombre,
-                                u.nombre AS usuario_nombre 
-                                FROM ordenes_venta o 
-                                LEFT JOIN clientes c ON c.id=o.cliente_id 
-                                LEFT JOIN usuarios u ON u.id=o.usuario_id 
-                                ORDER BY 
-                                o.created_at DESC
+                                f.id AS factura_id,
+                                f.estado AS estado_dian
+                                FROM ordenes_venta o
+                                LEFT JOIN clientes c ON c.id = o.cliente_id
+                                LEFT JOIN facturas f ON f.orden_id = o.id
+                                ORDER BY o.id DESC
         ")->fetchAll();
     }
     public function findWithDetails(int $id): ?array {

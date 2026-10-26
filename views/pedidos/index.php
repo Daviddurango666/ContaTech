@@ -93,59 +93,124 @@ $canCancel=RolePermissions::can($currentUser['rol'],'pedidos','cancel');
         </table>
     </div>
 
+    <!-- MODAL NUEVA ORDEN -->
+    <div id="modalOrdenFactura" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;overflow:auto;padding:20px;">
+      <div style="max-width:820px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="margin:0;font-size:18px;">Nueva orden de venta</h2>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModal()">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label>Cliente (ID)</label>
+          <input type="number" id="ord_cliente" value="1" min="1" style="width:120px;padding:8px;border:1px solid #ccc;border-radius:8px;">
+          <span style="font-size:12px;color:#666;margin-left:8px;">Debe existir en la tabla clientes</span>
+        </div>
+
+        <div class="form-group">
+          <label>Método de pago</label>
+          <select id="ord_metodo" style="padding:8px;border-radius:8px;border:1px solid #ccc;">
+            <option value="1">Efectivo</option>
+            <option value="2">Tarjeta</option>
+            <option value="3">Transferencia</option>
+            <option value="4">Bold</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;align-items:center;">
+          <input
+            type="text"
+            id="ord_buscar"
+            placeholder="Buscar por ID o nombre..."
+            style="flex:1;max-width:180px;padding:8px;border-radius:8px;border:1px solid #ccc;"
+            oninput="filtrarProductos()"
+          >
+          <select id="ord_producto" style="flex:1;min-width:200px;padding:8px;border-radius:8px;border:1px solid #ccc;"></select>
+          <input type="number" id="ord_cant" value="1" min="1" style="width:80px;padding:8px;border-radius:8px;border:1px solid #ccc;">
+          <button type="button" class="btn btn-secondary" onclick="addItem()">+ Agregar</button>
+        </div>
+
+        <div class="table-wrap" style="box-shadow:none;">
+          <table class="data" id="tblItems">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>P. unit.</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div style="text-align:right;margin-top:12px;font-size:14px; border: 1px solid #D9D9D9;">
+          <div>Subtotal: <strong id="ord_subtotal">$0</strong></div>
+          <div>IVA (19%): <strong id="ord_iva">$0</strong></div>
+          <div style="font-size:18px;margin-top:4px;">Total: <strong id="ord_total">$0</strong></div>
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="guardarOrden()">Guardar orden + factura + pago</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal orden de venta (ticket) -->
-<div id="modalOrden" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;overflow:auto;padding:16px;">
-  <div id="ticketPrint" class="ticket">
-    <div class="ticket-header">
-      <div class="ticket-title">ContaTech</div>
-      <div class="ticket-sub">Orden de venta</div>
-      <div id="tk_numero" class="ticket-num">—</div>
-      <div id="tk_fecha">—</div>
-      <div id="tk_estado" class="ticket-estado">—</div>
+    <div id="modalOrden" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;overflow:auto;padding:16px;">
+      <div id="ticketPrint" class="ticket">
+        <div class="ticket-header">
+          <div class="ticket-title">ContaTech</div>
+          <div class="ticket-sub">Orden de venta</div>
+          <div id="tk_numero" class="ticket-num">—</div>
+          <div id="tk_fecha">—</div>
+          <div id="tk_estado" class="ticket-estado">—</div>
+        </div>
+
+        <div class="ticket-sep">--------------------------------</div>
+
+        <div class="ticket-row">
+          <span>Cliente:</span>
+          <span id="tk_cliente">—</span>
+        </div>
+        <div class="ticket-row">
+          <span>Atendido por:</span>
+          <span id="tk_usuario">—</span>
+        </div>
+
+        <div class="ticket-sep">--------------------------------</div>
+
+        <table class="ticket-items">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="r">Cant</th>
+              <th class="r">Precio</th>
+              <th class="r">Subt</th>
+            </tr>
+          </thead>
+          <tbody id="tk_detalle"></tbody>
+        </table>
+
+        <div class="ticket-sep">--------------------------------</div>
+
+        <div class="ticket-totals">
+          <div class="ticket-row"><span>Subtotal</span><strong id="tk_subtotal">—</strong></div>
+          <div class="ticket-row"><span>IVA (19%)</span><strong id="tk_impuestos">—</strong></div>
+          <div class="ticket-row total"><span>TOTAL</span><strong id="tk_total">—</strong></div>
+        </div>
+
+        <div class="ticket-sep">--------------------------------</div>
+        <div class="ticket-footer">¡Gracias por su compra!</div>
+
+        <div class="no-print ticket-actions">
+          <button class="btn btn-secondary" onclick="cerrarOrden()">Cerrar</button>
+          <button class="btn btn-primary" onclick="imprimirTermica()">Imprimir térmica</button>
+        </div>
+      </div>
     </div>
-
-    <div class="ticket-sep">--------------------------------</div>
-
-    <div class="ticket-row">
-      <span>Cliente:</span>
-      <span id="tk_cliente">—</span>
-    </div>
-    <div class="ticket-row">
-      <span>Atendido por:</span>
-      <span id="tk_usuario">—</span>
-    </div>
-
-    <div class="ticket-sep">--------------------------------</div>
-
-    <table class="ticket-items">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th class="r">Cant</th>
-          <th class="r">Precio</th>
-          <th class="r">Subt</th>
-        </tr>
-      </thead>
-      <tbody id="tk_detalle"></tbody>
-    </table>
-
-    <div class="ticket-sep">--------------------------------</div>
-
-    <div class="ticket-totals">
-      <div class="ticket-row"><span>Subtotal</span><strong id="tk_subtotal">—</strong></div>
-      <div class="ticket-row"><span>IVA (19%)</span><strong id="tk_impuestos">—</strong></div>
-      <div class="ticket-row total"><span>TOTAL</span><strong id="tk_total">—</strong></div>
-    </div>
-
-    <div class="ticket-sep">--------------------------------</div>
-    <div class="ticket-footer">¡Gracias por su compra!</div>
-
-    <div class="no-print ticket-actions">
-      <button class="btn btn-secondary" onclick="cerrarOrden()">Cerrar</button>
-      <button class="btn btn-primary" onclick="imprimirTermica()">Imprimir térmica</button>
-    </div>
-  </div>
-</div>
 
 </main>
 <script>
@@ -172,41 +237,166 @@ $canCancel=RolePermissions::can($currentUser['rol'],'pedidos','cancel');
                 </td></tr>`).join('');
     }
     
+    let products = [];
+    let cart = []; // { producto_id, nombre, cantidad, precio_unitario, subtotal }
+
+    async function load() {
+      const r = await ContaAPI.get('pedidos');
+      const lista = (r.data || []).slice().sort((a, b) => b.id - a.id);
+      document.querySelector('#tbl tbody').innerHTML = lista.length
+        ? lista.map(o => `
+            <tr>
+              <td>${o.numero}</td>
+              <td>${o.cliente_nombre || '—'}</td>
+              <td>${fmt(o.total)}</td>
+              <td><span class="badge badge-${o.estado}">${o.estado}</span></td>
+              <td>${(o.created_at || '').toString().slice(0, 10)}</td>
+              <td>
+                <button class="btn btn-sm btn-secondary" onclick="verOrden(${o.id})">Ver / Imprimir</button>
+                ${o.factura_id && o.estado_dian !== 'enviada_dian'
+                  ? `<button class="btn btn-sm btn-primary" onclick="enviarDian(${o.factura_id})">DIAN</button>`
+                  : ''}
+              </td>
+            </tr>
+          `).join('')
+        : '<tr><td colspan="6" class="empty">Sin órdenes</td></tr>';
+    }
+
     async function openNew() {
+      cart = [];
+      renderCart();
       const pr = await ContaAPI.get('productos');
-      const products = pr.data.filter(p => p.activo == 1);
-      if (!products.length) {
-        alert('Sin productos');
+      products = (pr.data || []).filter(p => p.activo == 1);
+      const sel = document.getElementById('ord_producto');
+      sel.innerHTML = products.map(p =>
+        `<option value="${p.id}" data-precio="${p.precio}">${p.nombre} — ${fmt(p.precio)} (stock ${p.stock})</option>`
+      ).join('') || '<option value="">Sin productos</option>';
+      document.getElementById('modalOrdenFactura').style.display = 'block';
+    }
+
+    function cerrarModal() {
+      document.getElementById('modalOrdenFactura').style.display = 'none';
+    }
+
+    function renderProductSelect(lista) {
+      const sel = document.getElementById('ord_producto');
+      if (!lista.length) {
+        sel.innerHTML = '<option value="">Sin coincidencias</option>';
+        return;
+      }
+      sel.innerHTML = lista.map(p =>
+        `<option value="${p.id}" data-precio="${p.precio}">
+          #${p.id} — ${p.nombre} — ${fmt(p.precio)} (stock ${p.stock})
+        </option>`
+      ).join('');
+    }
+
+    function filtrarProductos() {
+      const q = (document.getElementById('ord_buscar').value || '').trim().toLowerCase();
+
+      if (!q) {
+        renderProductSelect(products);
         return;
       }
 
-      const pid = prompt(
-        'ID producto:\n' + products.map(p => p.id + ': ' + p.nombre + ' ($' + p.precio + ')').join('\n')
-      );
-      if (!pid) return;
+      const filtrados = products.filter(p => {
+        const idMatch = String(p.id) === q || String(p.id).includes(q);
+        const nombreMatch = (p.nombre || '').toLowerCase().includes(q);
+        const codigoMatch = (p.codigo || '').toLowerCase().includes(q);
+        return idMatch || nombreMatch || codigoMatch;
+      });
 
-      const cant = prompt('Cantidad:', '1');
-      const prod = products.find(p => String(p.id) === String(pid));
-      if (!prod) {
-        alert('Producto no encontrado. Usa el ID de la lista.');
-        return;
+      renderProductSelect(filtrados);
+    }
+
+    function addItem() {
+      const sel = document.getElementById('ord_producto');
+      const id = +sel.value;
+      const cant = Math.max(1, +document.getElementById('ord_cant').value || 1);
+      const prod = products.find(p => p.id == id);
+      if (!prod) return alert('Selecciona un producto');
+
+      const existing = cart.find(c => c.producto_id === id);
+      if (existing) {
+        existing.cantidad += cant;
+        existing.subtotal = existing.cantidad * existing.precio_unitario;
+      } else {
+        cart.push({
+          producto_id: id,
+          nombre: prod.nombre,
+          cantidad: cant,
+          precio_unitario: +prod.precio,
+          subtotal: cant * +prod.precio
+        });
       }
+      renderCart();
+    }
+
+    function removeItem(i) {
+      cart.splice(i, 1);
+      renderCart();
+    }
+
+    function renderCart() {
+      const sub = cart.reduce((s, c) => s + c.subtotal, 0);
+      const iva = Math.round(sub * 0.19);
+      const tot = sub + iva;
+
+      document.querySelector('#tblItems tbody').innerHTML = cart.length
+        ? cart.map((c, i) => `
+            <tr>
+              <td>${c.nombre}</td>
+              <td>${c.cantidad}</td>
+              <td>${fmt(c.precio_unitario)}</td>
+              <td>${fmt(c.subtotal)}</td>
+              <td><button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${i})">Quitar</button></td>
+            </tr>
+          `).join('')
+        : '<tr><td colspan="5" class="empty">Agrega productos</td></tr>';
+
+      document.getElementById('ord_subtotal').textContent = fmt(sub);
+      document.getElementById('ord_iva').textContent = fmt(iva);
+      document.getElementById('ord_total').textContent = fmt(tot);
+    }
+
+    async function guardarOrden() {
+      if (!cart.length) return alert('Agrega al menos un producto');
+
+      const cliente_id = +document.getElementById('ord_cliente').value || null;
+      const metodo_pago_id = +document.getElementById('ord_metodo').value || 1;
 
       try {
         const res = await ContaAPI.post('pedidos', {
-          cliente_id: 1, // debe existir en clientes
-          items: [{
-            producto_id: +pid,
-            cantidad: +cant || 1,
-            precio_unitario: +prod.precio
-          }]
+          cliente_id,
+          metodo_pago_id,
+          auto_factura: true,  // genera factura
+          auto_pago: true,     // registra pago
+          items: cart.map(c => ({
+            producto_id: c.producto_id,
+            cantidad: c.cantidad,
+            precio_unitario: c.precio_unitario
+          }))
         });
-        alert('Orden creada: ' + (res.data?.numero || 'OK'));
+        alert('Orden + factura + pago creados: ' + (res.data?.orden?.numero || res.data?.numero || 'OK'));
+        cerrarModal();
         await load();
       } catch (e) {
-        alert('Error al crear: ' + e.message);
+        alert('Error: ' + e.message);
       }
     }
+
+    async function enviarDian(facturaId) {
+      if (!confirm('¿Enviar factura electrónica a DIAN?')) return;
+      try {
+        await ContaAPI.post('facturas/' + facturaId + '/dian');
+        alert('Enviada a DIAN');
+        load();
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    load();
     
     async function ver(id){
         const r=await ContaAPI.get('pedidos/'+id);
