@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../../core/Controller.php';
+require_once __DIR__ . '/../../microservice-orders/Models/OrderModel.php';
 
 class ReportController extends Controller {
     
@@ -176,6 +177,10 @@ class ReportController extends Controller {
         
         AuthMiddleware::handle('dashboard','view');
         
+        $ordersModel = new OrderModel();
+
+        
+
         $ing=(float)$this->db->query("
                                         SELECT COALESCE(SUM(monto),0) t 
                                         FROM movimientos 
@@ -194,7 +199,7 @@ class ReportController extends Controller {
             'ingresos'=>$ing,
             'egresos'=>$egr,
             'saldo'=>$ing-$egr,
-
+            'ultimas_ordenes' => $ordersModel->lastOrders(5),
             'productos'=>(int)$this->db->query("
                                                 SELECT COUNT(*) c 
                                                 FROM productos 

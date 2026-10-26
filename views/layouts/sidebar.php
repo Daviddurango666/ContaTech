@@ -17,9 +17,12 @@ $currentRoute = $currentRoute ?? '';
         		</a>
       		</li>
     	<?php endforeach; ?>
-		<li style="margin-top:20px;">
-			<button type="button" onclick="logout()">Cerrar sesión</button>
-		</li>
+		<div class="sub-menu">
+			<li style="margin-top:20px;">
+				<button type="button" onclick="logout()"><img class="icon" src="../../public/assets/img/menu/log-out.png" alt=""> Cerrar sesión</button>
+				<button type="button" onclick="logout()"><img class="icon" src="../../public/assets/img/menu/profile.png" alt=""> Perfil</button>
+			</li>
+		</div>
 	</ul>
 </aside>
 

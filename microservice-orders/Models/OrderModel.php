@@ -77,6 +77,30 @@ class OrderModel extends Model {
             throw $e; 
         }
     }
+
+    public function lastOrders(int $limit = 5): array {
+        $limit = (int)$limit;
+        if ($limit < 1) $limit = 5;
+        if ($limit > 50) $limit = 50;
+
+        $sql = "
+            SELECT
+                ov.id,
+                ov.numero,
+                ov.estado,
+                ov.subtotal,
+                ov.impuestos,
+                ov.total,
+                ov.created_at,
+                c.nombre AS cliente_nombre
+            FROM ordenes_venta ov
+            LEFT JOIN clientes c ON c.id = ov.cliente_id
+            ORDER BY ov.id DESC
+            LIMIT {$limit}
+        ";
+        return $this->db->query($sql)->fetchAll();
+    }
+
     public function allWithRelations(): array {
         return $this->db->query("
                                 SELECT 

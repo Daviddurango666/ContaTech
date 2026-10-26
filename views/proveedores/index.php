@@ -44,7 +44,7 @@ $canDelete=RolePermissions::can($currentUser['rol'],'proveedores','delete');
         </table>
     </div>
     <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;">
-        <div class="form-card" style="margin:auto;">
+        <div class="form-card" style="margin:auto;width: 400px;">
             <h2 style="margin-bottom:16px;">Proveedor</h2>
             <input type="hidden" id="pid">
             <div class="form-group">

@@ -37,7 +37,7 @@ async function loadReport(tipo){
     const r=await ContaAPI.get('informes/'+tipo);
     const d=r.data;
     if(tipo==='balance'){
-      box.innerHTML=`<h2>Balance general — ${d.fecha}</h2>
+      box.innerHTML=`<h2>Balance general — ${d.fecha}</h2><br><br>
         <table class="data">
           <tr>
             <th>Activos</th>
@@ -62,7 +62,7 @@ async function loadReport(tipo){
           </tr>
         </table>`;
     } else if(tipo==='estado-resultados'){
-        box.innerHTML=`<h2>Estado de resultados — ${d.fecha}</h2>
+        box.innerHTML=`<h2>Estado de resultados — ${d.fecha}</h2><br><br>
           <table class="data">
             <tr>
               <td>Ventas</td>
@@ -100,7 +100,7 @@ async function loadReport(tipo){
           `).join('');
 
         box.innerHTML=`
-          <h2>Flujo de caja (${d.desde} — ${d.hasta})</h2>
+          <h2>Flujo de caja (${d.desde} — ${d.hasta})</h2><br><br>
           <p>Total ingresos: ${fmt(d.totales.ingresos)} | Total egresos: ${fmt(d.totales.egresos)}</p>
           <table class="data">
             <thead>
@@ -116,7 +116,7 @@ async function loadReport(tipo){
           </table>`;
     } else if(tipo==='impuestos'){
         box.innerHTML=`
-          <h2>Reporte de impuestos — ${d.periodo}</h2>
+          <h2>Reporte de impuestos — ${d.periodo}</h2><br><br>
           <p>IVA generado: <strong>${fmt(d.iva_generado)}</strong></p>
           <p style="color:#666;font-size:13px;">${d.nota||''}</p>
         `;

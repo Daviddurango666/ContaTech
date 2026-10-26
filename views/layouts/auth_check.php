@@ -13,7 +13,7 @@ try {
     $currentUser = JWT::decode($token); 
 } catch (Exception $e) { 
     setcookie('contatech_token','',time()-3600,'/'); 
-    header('Location: /ContaTech/views/auth/login.php'); 
+    header('Location: /ContaTech1/views/auth/login.php'); 
     exit; 
 }
 

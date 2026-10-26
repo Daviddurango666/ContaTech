@@ -48,8 +48,8 @@ $roles=$appCfg['roles'];
         </table>
     </div>
     <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;">
-        <div class="form-card" style="margin:auto;max-width:480px;">
-            <h2 id="formTitle" style="margin-bottom:16px;">Usuario</h2>
+        <div class="form-card" style="margin:auto;width:400px;">
+            <h2 id="formTitle" style="margin-bottom:16px; place-self: center;">Usuario</h2>
             <input type="hidden" id="uid">
             <div class="form-group">
                 <label>Nombre</label>

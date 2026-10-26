@@ -54,7 +54,7 @@ class UserController extends Controller {
                 }
             }
         
-        $cfg=require __DIR__.'/../../../config/app.php';
+        $cfg=require __DIR__.'/../../config/app.php';
 
         if(!isset($cfg['roles'][$d['rol']])) {
             Response::error('Rol no válido.',422);

@@ -2,7 +2,7 @@
 class DianService {
     private array $cfg;
     public function __construct(){ 
-        $this->cfg=(require __DIR__.'/../../../config/app.php')['dian']; 
+        $this->cfg=(require __DIR__.'/../../config/app.php')['dian']; 
     }
     
     public function sendInvoice(array $factura): array {

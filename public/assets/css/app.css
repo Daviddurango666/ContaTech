@@ -69,6 +69,9 @@ body{
     width:18px;
     height:18px
 }
+.sub-menu {
+    border-top: 1px solid #D9D9D9 ;
+}
 .main-content{
     margin-left:230px;
     padding:28px 32px;
@@ -180,7 +183,10 @@ table.data th
     border-radius:12px;
     padding:24px;
     max-width:560px;
-    box-shadow:0 1px 3px rgba(0,0,0,.06)
+    box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+.form-card h2 {
+    place-self: center;
 }
 .form-group{
     margin-bottom:16px
@@ -200,10 +206,12 @@ table.data th
     border-radius:8px;
     font-size:14px
 }
+.ticket-actions,
 .form-actions{
     display:flex;
     gap:10px;
-    margin-top:20px
+    margin-top:20px;
+    justify-content: space-around;
 }
 .badge{
     display:inline-block;
@@ -274,18 +282,27 @@ table.data th
     color:#888;
     align-self: center ;
 }
-.chart-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(500px,1fr));
-    gap:16px;
-    max-width: 400px;
-    max-height: 600px;
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+  gap: 16px;
+  margin-bottom: 10px;
+  align-items: stretch;
 }
-.chart-box{
-    background:#fff;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 1px 3px rgba(0,0,0,.06)
+
+.chart-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  min-width: 0; /* evita que el canvas rompa el grid */
+}
+
+.chart-box h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
 }
 
 /* responsive */
@@ -300,5 +317,8 @@ table.data th
     }
     body{
         flex-direction:column
+    }
+    .chart-grid {
+      grid-template-columns: 1fr;
     }
 }

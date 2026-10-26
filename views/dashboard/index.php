@@ -47,84 +47,114 @@ require __DIR__.'/../layouts/sidebar.php';
     </div>
 
     <div class="chart-grid">
+        <!-- Izquierda: barras -->
         <div class="chart-box">
-            <h3>Egresos</h3>
-            <canvas id="chartEgresos" height="220"></canvas>
+            <h3>Ingresos / Egresos</h3>
+            <canvas id="chartIE"></canvas>
         </div>
+
+        <!-- Derecha: últimas órdenes -->
         <div class="chart-box">
-            <h3>Ingresos</h3>
-            <canvas id="chartIngresos" height="220"></canvas>
+            <h3>Últimas órdenes de venta</h3>
+            <div class="table-wrap" style="box-shadow:none;border-radius:0;">
+            <table class="data" id="tblUltimasOrdenes">
+                <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td colspan="4" class="empty">Cargando…</td></tr>
+                </tbody>
+            </table>
+            </div>
         </div>
     </div>
+
 </main>
 <script>
 const fmt = n => new Intl.NumberFormat('es-CO', {
-    style: 'currency', currency: 'COP', maximumFractionDigits: 0
+  style: 'currency',
+  currency: 'COP',
+  maximumFractionDigits: 0
 }).format(n || 0);
 
 function barOptions() {
-    return {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: (ctx) => fmt(ctx.raw) } }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                callback: (v) => new Intl.NumberFormat('es-CO', {
-                notation: 'compact', maximumFractionDigits: 1
-                }).format(v)
-                },
-                grid: { color: '#f0f0f0' }
-            },
-            x: { 
-                grid: { 
-                    display: false 
-                } 
-            }
+  return {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => fmt(ctx.raw)
         }
-    };
-}
-
-function makeBarChart(canvasId, label, value, color) {
-    return new Chart(document.getElementById(canvasId), {
-        type: 'bar',
-        data: {
-            labels: [label],
-            datasets: [{
-                label: label,
-                data: [value],
-                backgroundColor: color,
-                borderWidth: 0,
-                borderRadius: 50,       // redondeo de la barra
-                borderSkipped: false,   // redondea también la base
-                maxBarThickness: 80
-            }]
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (v) => new Intl.NumberFormat('es-CO', {
+            notation: 'compact',
+            maximumFractionDigits: 1
+          }).format(v)
         },
-        options: barOptions()
-    });
+        grid: { color: '#f0f0f0' }
+      },
+      x: { grid: { display: false } }
+    }
+  };
 }
 
 async function load() {
-    try {
-        const res = await ContaAPI.get('informes/dashboard');
-        const d = res.data;
+  try {
+    const res = await ContaAPI.get('informes/dashboard');
+    const d = res.data;
 
-        kpiIngresos.textContent = fmt(d.ingresos);
-        kpiEgresos.textContent = fmt(d.egresos);
-        kpiSaldo.textContent = fmt(d.saldo);
-        kpiProd.textContent = d.productos;
-        kpiLow.textContent = d.alertas_stock;
-        kpiOV.textContent = d.ordenes_pendientes;
+    kpiIngresos.textContent = fmt(d.ingresos);
+    kpiEgresos.textContent = fmt(d.egresos);
+    kpiSaldo.textContent = fmt(d.saldo);
+    kpiProd.textContent = d.productos;
+    kpiLow.textContent = d.alertas_stock;
+    kpiOV.textContent = d.ordenes_pendientes;
 
-        makeBarChart('chartIngresos', 'Ingresos', d.ingresos, '#16a34a');
-        makeBarChart('chartEgresos', 'Egresos', d.egresos, '#dc2626');
-    } catch (e) {
-        console.error(e);
-    }
+    // 1) Una sola gráfica de barras: Ingresos + Egresos
+    new Chart(document.getElementById('chartIE'), {
+      type: 'bar',
+      data: {
+        labels: ['Ingresos', 'Egresos'],
+        datasets: [{
+          data: [d.ingresos, d.egresos],
+          backgroundColor: ['#57CE23', '#F02222'],
+          borderWidth: 0,
+          borderRadius: 12,
+          borderSkipped: false,
+          maxBarThickness: 80
+        }]
+      },
+      options: barOptions()
+    });
+
+    // Tabla últimas 5 órdenes
+    const lista = d.ultimas_ordenes || [];
+    const tbody = document.querySelector('#tblUltimasOrdenes tbody');
+    tbody.innerHTML = lista.length
+      ? lista.map(o => `
+          <tr>
+            <td>${o.numero || ('#' + o.id)}</td>
+            <td>${o.cliente_nombre || '—'}</td>
+            <td><span class="badge badge-${o.estado}">${o.estado}</span></td>
+            <td>${fmt(o.total)}</td>
+          </tr>
+        `).join('') : '<tr><td colspan="4" class="empty">Sin órdenes recientes</td></tr>';
+  } catch (e) {
+    console.error(e);
+  }
 }
+
 load();
 </script>
 </body>

@@ -15,6 +15,13 @@ class OrderController extends Controller {
         Response::success($this->orders->allWithRelations()); 
     }
 
+    public function lastOrders(): void {
+        AuthMiddleware::handle('pedidos','read'); 
+        $o = $this->orders->lastOrders();
+
+        Response::success($o); 
+    }
+
     public function show(int $id): void { 
         AuthMiddleware::handle('pedidos','read'); 
         $o=$this->orders->findWithDetails($id); 

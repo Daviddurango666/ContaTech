@@ -40,7 +40,7 @@ class AuthController extends Controller {
             'user'=>$payload,
             'menu'=>RolePermissions::menuFor($user['rol']),
             'expires_in'=>(
-                require __DIR__.'/../../../config/app.php'
+                require __DIR__.'/../../config/app.php'
             )
             ['jwt_expire']],
             'Inicio de sesión exitoso'

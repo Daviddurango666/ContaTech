@@ -77,17 +77,24 @@ class InvoiceModel extends Model {
         ")->fetchAll();
     }
     public function findWithDetails(int $id): ?array {
-        $f=$this->findById($id); 
-        if(!$f){
-            return null;
-        }
-        $s=$this->db->prepare("
-                                SELECT * FROM facturas_detalle 
-                                WHERE 
-                                factura_id=?"
-        ); 
-        $s->execute([$id]); 
-        $f['detalle']=$s->fetchAll(); 
+        $s = $this->db->prepare("
+            SELECT f.*,
+                c.nombre AS cliente_nombre,
+                c.documento AS cliente_documento,
+                c.tipo_doc AS cliente_tipo_doc,
+                u.nombre AS usuario_nombre
+            FROM facturas f
+            LEFT JOIN clientes c ON c.id = f.cliente_id
+            LEFT JOIN usuarios u ON u.id = f.usuario_id
+            WHERE f.id = ?
+        ");
+        $s->execute([$id]);
+        $f = $s->fetch();
+        if (!$f) return null;
+
+        $d = $this->db->prepare("SELECT * FROM facturas_detalle WHERE factura_id = ?");
+        $d->execute([$id]);
+        $f['detalle'] = $d->fetchAll();
         return $f;
     }
     public function markAccounting(int $id): void {

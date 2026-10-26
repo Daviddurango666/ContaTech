@@ -21,7 +21,7 @@ require __DIR__ . '/../layouts/sidebar.php';
         <p>Módulo de soporte para el rol <strong>Soporte</strong>.</p>
         <p style="margin-top:12px;color:#666;">Desde aquí se puede consultar usuarios y brindar asistencia sobre el sistema ContaTech.</p>
         <p style="margin-top:16px;">
-            <a class="btn btn-secondary" href="/ContaTech/views/usuarios/index.php">Ver usuarios</a>
+            <a class="btn btn-secondary" href="/ContaTech1/views/usuarios/index.php">Ver usuarios</a>
         </p>
     </div>
 </main>

@@ -5,7 +5,7 @@ class BoldService {
     private array $cfg;
     
     public function __construct(){ 
-        $this->cfg=(require __DIR__.'/../../../config/app.php')['bold']; 
+        $this->cfg=(require __DIR__.'/../../config/app.php')['bold']; 
     }
 
     public function createPayment(float $amount, string $description, array $meta=[]): array {
