@@ -24,8 +24,8 @@ class InvoiceController extends Controller {
         
         if(!$f){
             Response::error('No encontrada.',404); 
-            Response::success($f); 
-        }
+            }
+        Response::success($f); 
     }
 
     public function generate(): void {

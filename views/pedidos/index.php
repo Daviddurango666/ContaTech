@@ -398,11 +398,6 @@ $canCancel=RolePermissions::can($currentUser['rol'],'pedidos','cancel');
 
     load();
     
-    async function ver(id){
-        const r=await ContaAPI.get('pedidos/'+id);
-        const o=r.data;
-        alert(`Orden ${o.numero}\nEstado: ${o.estado}\nTotal: ${fmt(o.total)}\n`+(o.detalle||[]).map(d=>`- ${d.producto_nombre} x${d.cantidad}`).join('\n'));
-    }
     
     async function cancelar(id){
         if(!confirm('¿Anular y devolver stock?')){

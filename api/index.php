@@ -27,13 +27,6 @@ if ($path === '' && !empty($_SERVER['PATH_INFO'])){
     $path = ltrim($_SERVER['PATH_INFO'], '/');
 }
 
-if ($path === '' && !empty($_SERVER['REQUEST_URI'])) {
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    if (preg_match('#/api(?:/index\.php)?/(.+)$#', $uri, $m)){ 
-        $path = $m[1];
-    }
-}
-
 $path = trim($path, '/');
 $parts = $path === '' ? [] : explode('/', $path);
 $method = strtoupper($_SERVER['REQUEST_METHOD']);

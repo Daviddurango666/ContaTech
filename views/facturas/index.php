@@ -208,6 +208,8 @@ body.thermal-print .fe-table th { background: none !important; }
             <div class="fe-row fe-total"><span>Total a pagar</span><strong id="fe_total">—</strong></div>
             </div>
 
+            <div id="contenedor-qr"></div>
+
             <div class="fe-legal">
             Documento equivalente a factura electrónica de venta.
             Representación gráfica para consulta e impresión.
@@ -290,10 +292,25 @@ async function dian(id){
 
 async function ver(id) {
   try {
-    const r = await ContaAPI.get('facturas/' + id);
-    const f = r.data;
+    const fac = await ContaAPI.get('facturas/' + id);
+    const f = fac.data;
 
-    document.getElementById('fe_numero').textContent = f.numero || '—';
+    // Limpiar QR anterior
+    const contQr = document.getElementById('contenedor-qr');
+    contQr.innerHTML = '';
+
+    if (f.cufe) {
+      const imagen_qr = document.createElement('img');
+      imagen_qr.src =
+        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' +
+        encodeURIComponent(f.cufe);
+      imagen_qr.alt = 'Código QR CUFE';
+      imagen_qr.style.display = 'block';
+      imagen_qr.style.margin = '16px auto 0';
+      contQr.appendChild(imagen_qr);
+    }
+
+    document.getElementById('fe_numero').textContent = f.numero || ('#' + f.id);
     document.getElementById('fe_fecha').textContent =
       f.fecha || (f.created_at || '').toString().slice(0, 10);
 
@@ -304,10 +321,14 @@ async function ver(id) {
     document.getElementById('fe_cliente').textContent =
       f.cliente_nombre || ('Cliente #' + (f.cliente_id || '—'));
     document.getElementById('fe_cliente_doc').textContent =
-      f.cliente_documento ? (f.cliente_tipo_doc || 'Doc') + ' ' + f.cliente_documento : '';
+      f.cliente_documento
+        ? (f.cliente_tipo_doc || 'Doc') + ' ' + f.cliente_documento
+        : '';
 
-    document.getElementById('fe_cufe').textContent = f.cufe || 'No generado (pendiente DIAN)';
-    document.getElementById('fe_contable').textContent = f.registro_contable == 1 ? 'Sí' : 'No';
+    document.getElementById('fe_cufe').textContent =
+      f.cufe || 'No generado (pendiente DIAN)';
+    document.getElementById('fe_contable').textContent =
+      f.registro_contable == 1 ? 'Sí' : 'No';
     document.getElementById('fe_usuario').textContent =
       f.usuario_nombre || ('#' + (f.usuario_id || '—'));
 
@@ -327,7 +348,6 @@ async function ver(id) {
     document.getElementById('fe_impuestos').textContent = fmt(f.impuestos);
     document.getElementById('fe_total').textContent = fmt(f.total);
 
-    document.body.classList.remove('thermal-print');
     document.getElementById('modalFactura').style.display = 'block';
   } catch (e) {
     alert(e.message);
