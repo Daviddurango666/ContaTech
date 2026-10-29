@@ -300,9 +300,10 @@ async function ver(id) {
     contQr.innerHTML = '';
 
     if (f.cufe) {
+      const link = `https://catalogo-vpfe.dian.gov.co/User/SearchDocument?DocumentKey=`;
       const imagen_qr = document.createElement('img');
       imagen_qr.src =
-        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' +
+        'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' +link+
         encodeURIComponent(f.cufe);
       imagen_qr.alt = 'Código QR CUFE';
       imagen_qr.style.display = 'block';

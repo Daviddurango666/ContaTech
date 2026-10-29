@@ -61,7 +61,14 @@ class UserController extends Controller {
         }
         try{ 
             $id=$this->users->create($d); 
-            Response::success(['id'=>$id],'Usuario creado.',201); 
+            if(!$id) {
+                Response::error('Error al registrar el usuario.',409); 
+                echo '<alert>Error al registrar el usuario.</alert>';
+            } else {
+                Response::success(['id'=>$id],'Usuario creado.',201); 
+                echo '<alert>Usuario creado.</alert>';
+            }
+
         } catch(PDOException $e){ 
             Response::error('Email/usuario duplicado.',409); 
         }

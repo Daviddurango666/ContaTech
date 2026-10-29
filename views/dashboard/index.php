@@ -56,7 +56,7 @@ require __DIR__.'/../layouts/sidebar.php';
         <!-- Derecha: últimas órdenes -->
         <div class="chart-box">
             <h3>Últimas órdenes de venta</h3>
-            <div class="table-wrap" style="box-shadow:none;border-radius:0;">
+            <div class="table-wrap" style="box-shadow:none;border-radius:0;border-radius: 10px;">
             <table class="data" id="tblUltimasOrdenes">
                 <thead>
                 <tr>
