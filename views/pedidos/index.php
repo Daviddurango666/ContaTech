@@ -72,6 +72,7 @@ $canCancel=RolePermissions::can($currentUser['rol'],'pedidos','cancel');
         <?php 
             if($canCreate):?>
                 <button class="btn btn-primary" onclick="openNew()">+ Nueva orden</button>
+                <!-- <button class="btn btn-primary" onclick="openNewClient()">+ Nuevo Cliente</button> -->
             <?php endif;
         ?>
     </div>
@@ -272,6 +273,10 @@ $canCancel=RolePermissions::can($currentUser['rol'],'pedidos','cancel');
         `<option value="${p.id}" data-precio="${p.precio}">${p.nombre} — ${fmt(p.precio)} (stock ${p.stock})</option>`
       ).join('') || '<option value="">Sin productos</option>';
       document.getElementById('modalOrdenFactura').style.display = 'block';
+    }
+
+    async function openNewClient() {
+
     }
 
     function cerrarModal() {

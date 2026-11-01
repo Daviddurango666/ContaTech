@@ -67,8 +67,8 @@ class ProviderController extends Controller {
         if(!$p){
             Response::error('No encontrado.',404);
         }
-
-        $this->model->updateProvider($id,array_merge($p,['activo'=>0])); 
-        Response::success(null,'Desactivado.');
+    
+        $this->db->prepare('UPDATE proveedores set activo = 0 WHERE id = ?')->execute([$id]);
+        Response::success(null,'Proveedor Desactivado.');
     }
 }

@@ -26,14 +26,16 @@ $roles=$appCfg['roles'];
         <?php 
             if($canCreate):?>
                 <button class="btn btn-primary" onclick="openForm()">+ Crear usuario</button>
-            <?php endif;
+                <?php endif;
         ?>
     </div>
+    <!-- mensaje de usuario actualizado -->
+    <div id="msg" style="display:none;padding:12px 16px;border-radius:8px;margin-bottom:12px;"></div>
     <div class="table-wrap">
         <table class="data" id="tbl">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <!-- <th>ID</th> -->
                     <th>Nombre</th>
                     <th>Usuario</th>
                     <th>Email</th>
@@ -83,6 +85,9 @@ $roles=$appCfg['roles'];
             </div>
         </div>
     </div>
+
+
+
 </main>
 <script>
     const canUpdate=<?=$canUpdate?'true':'false'?>,canDelete=<?=$canDelete?'true':'false'?>;
@@ -92,7 +97,6 @@ $roles=$appCfg['roles'];
         const lista = res.data.slice().sort((a, b) => a.id - b.id); // ASC por id
         document.querySelector('#tbl tbody').innerHTML=lista.map(u=>`
             <tr>
-                <td>${u.id}</td>
                 <td>${u.nombre}</td>
                 <td>${u.usuario}</td>
                 <td>${u.email}</td>
@@ -125,6 +129,17 @@ $roles=$appCfg['roles'];
     function closeForm(){
         modal.style.display='none';
     }
+
+    function showMsg(text, ok = true) {
+        const el = document.getElementById('msg');
+        if (!el) return;
+        el.style.display = 'block';
+        el.style.background = ok ? '#dcfce7' : '#fee2e2';
+        el.style.color = ok ? '#166534' : '#991b1b';
+        el.textContent = text;
+        setTimeout(() => { el.style.display = 'none'; }, 3000);
+    }
+
     async function saveUser(){
         const id=uid.value;
         const body={
@@ -138,9 +153,15 @@ $roles=$appCfg['roles'];
         try{
             if(id) {
                 await ContaAPI.post('usuarios/'+id,body);
+                closeForm();
+                await load();
+                showMsg('Usuario actualizado correctamente');
             }else{
                 body.password=password.value||'Admin123!';
                 await ContaAPI.post('usuarios',body);
+                closeForm();
+                await load();
+                showMsg('Usuario creado correctamente');
             }
             closeForm();
             load();
@@ -155,6 +176,7 @@ $roles=$appCfg['roles'];
         await ContaAPI.post('usuarios/'+id+'/delete');
         load();
     }
+
     load();
 </script>
 </body>

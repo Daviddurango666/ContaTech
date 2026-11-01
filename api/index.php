@@ -66,6 +66,9 @@ function route(array $parts, string $method): void {
             if ($method==='POST' && ($parts[1]??'')==='change-password'){
                 $c->changePassword();
             } 
+            if ($method==='POST' && ($parts[1]??'')==='register'){
+                $c->register();
+            } 
             break;
         case 'usuarios':
             $c = new UserController();

@@ -19,6 +19,7 @@ if (!empty($_COOKIE['contatech_token'])) {
         <title>Iniciar sesión | ContaTech</title>
         <link rel="stylesheet" href="<?= $base ?>/public/assets/css/login.css">
         <link rel="stylesheet" href="<?= $base ?>/public/assets/css/app.css">
+        <link rel="icon" href="<?= $base ?>/public/assets/img/favicon_io/favicon.ico">
         <script src="<?= $base ?>/public/assets/js/api.js"></script>
         <style>
             .login-box 
@@ -57,6 +58,7 @@ if (!empty($_COOKIE['contatech_token'])) {
                 <input class="input-email" type="password" id="password" placeholder="Contraseña" required>
                 <button type="submit" class="btn-email">Continuar</button>
             </form>
+            <p style="font-size:12px;">¿No tiene cuenta?<a href="register.php" style="color:#000;"> Registrese aquí</a></p>
             <p style="font-size:12px;"><a href="forgot.php" style="color:#000;">¿Olvidó su contraseña?</a></p>
             <div class="demo-users"><strong>Usuarios de prueba</strong> (clave: <code>Admin123!</code>)<br>admin · gerente · jefe · contable · cajero · bodeguero · soporte</div>
         </div>

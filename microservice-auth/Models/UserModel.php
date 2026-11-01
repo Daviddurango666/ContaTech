@@ -74,8 +74,9 @@ class UserModel extends Model {
 
         if(!$f){
             return false; 
-            $p[]=$id;
-        }
+            }
+            
+        $p[]=$id;
         
         return $this->db->prepare("UPDATE usuarios SET ".implode(',',$f)." WHERE id=?")->execute($p);
     }

@@ -40,7 +40,6 @@ $canConc = RolePermissions::can($currentUser['rol'], 'pagos', 'conciliar');
 		<table class="data" id="tbl">
 	  		<thead>
 				<tr>
-					<th>ID</th>
 					<th>Método</th>
 					<th>Monto</th>
 					<th>Factura</th>
@@ -64,7 +63,6 @@ $canConc = RolePermissions::can($currentUser['rol'], 'pagos', 'conciliar');
 	const lista = r.data.slice().sort((a, b) => String(a.id).localeCompare(String(b.id), 'es', { numeric: true })); // ASC por id
 	document.querySelector('#tbl tbody').innerHTML=lista.map(p=>`
 		<tr>
-			<td>${p.id}</td>
 			<td>${p.metodo_nombre}</td>
 			<td>${fmt(p.monto)}</td>
 			<td>${p.factura_numero||'—'}</td>

@@ -10,6 +10,7 @@ $base=$appCfg['base_url'];
         <title>Recuperar | ContaTech</title>
         <link rel="stylesheet" href="<?= $base ?>/public/assets/css/login.css">
         <link rel="stylesheet" href="<?= $base ?>/public/assets/css/app.css">
+        <link rel="icon" href="<?= $base ?>/public/assets/img/favicon_io/favicon.ico">
         <script src="<?= $base ?>/public/assets/js/api.js"></script>
     </head>
 <body>
