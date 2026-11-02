@@ -10,8 +10,9 @@ require __DIR__ . '/../layouts/header.php';
 require __DIR__ . '/../layouts/sidebar.php';
 
 $base = $appCfg['base_url'] ?? '';
-$whatsappNumber = '+57 301 663 3097';
-$whatsappLink   = 'https://wa.me/573016633097';
+$whatsappNumber = '+57 300 535 1013 - +57 301 663 3097';
+$whatsappLink1   = 'https://wa.me/573005351013';
+$whatsappLink2   = 'https://wa.me/573016633097';
 ?>
 <main class="main-content">
   <div class="header">
@@ -27,7 +28,12 @@ $whatsappLink   = 'https://wa.me/573016633097';
     <p style="margin:0 0 12px;color:#555;">
       Número oficial: <strong><?= htmlspecialchars($whatsappNumber) ?></strong>
     </p>
-    <a class="btn btn-success" href="<?= htmlspecialchars($whatsappLink) ?>" target="_blank" rel="noopener">
+    <a class="btn btn-success" href="<?= htmlspecialchars($whatsappLink1) ?>" target="_blank" rel="noopener">
+        Abrir conversación en WhatsApp
+    </a>
+    <br>
+    <br>
+    <a class="btn btn-success" href="<?= htmlspecialchars($whatsappLink2) ?>" target="_blank" rel="noopener">
       Abrir conversación en WhatsApp
     </a>
     <p style="margin-top:12px;font-size:13px;color:#777;">
