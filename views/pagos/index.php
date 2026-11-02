@@ -53,6 +53,19 @@ $canConc = RolePermissions::can($currentUser['rol'], 'pagos', 'conciliar');
 			</tbody>
 		</table>
 	</div>
+
+	<!-- Modal éxito -->
+	<div id="modalOk" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;">
+		<div style="background:#fff;border-radius:16px;padding:28px 32px;text-align:center;min-width:260px;box-shadow:0 12px 40px rgba(0,0,0,.18);">
+			<div style="width:56px;height:56px;margin:0 auto 12px;border-radius:50%;background:#e8f8ef;display:flex;align-items:center;justify-content:center;">
+				<svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+					<path d="M5 13l4 4L19 7" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+			</div>
+			<div style="font-size:13px;color:#666;text-transform:uppercase;letter-spacing:.04em;">Tipo</div>
+			<div id="modalOkMsg" style="font-size:18px;font-weight:700;margin-top:4px;color:#111;">Pago conciliado</div>
+		</div>
+	</div>
 </main>
 <script>
 	const canConc=<?= $canConc?'true':'false' ?>, canBold=<?= $canBold?'true':'false' ?>;
@@ -60,7 +73,11 @@ $canConc = RolePermissions::can($currentUser['rol'], 'pagos', 'conciliar');
 
 	async function load(){
 	const r=await ContaAPI.get('pagos');
-	const lista = r.data.slice().sort((a, b) => String(a.id).localeCompare(String(b.id), 'es', { numeric: true })); // ASC por id
+	const lista = (r.data || []).slice().sort((a, b) => {
+		// Descendente por id (últimos primero)
+		return (Number(b.id) || 0) - (Number(a.id) || 0);
+	});
+	// const lista = r.data.slice().sort((a, b) => String(a.id).localeCompare(String(b.id), 'es', { numeric: true })); // ASC por id
 	document.querySelector('#tbl tbody').innerHTML=lista.map(p=>`
 		<tr>
 			<td>${p.metodo_nombre}</td>
@@ -69,8 +86,12 @@ $canConc = RolePermissions::can($currentUser['rol'], 'pagos', 'conciliar');
 			<td><span class="badge badge-${p.estado}">${p.estado}</span></td>
 			<td style="font-size:11px;">${p.referencia||p.bold_payment_id||'—'}</td>
 		<td>
-			${canConc && !p.conciliado?`<button class="btn btn-sm btn-secondary" onclick="conciliar(${p.id})">Conciliar</button>`:''}
-			${canBold && p.bold_payment_id && p.estado==='pendiente'?`<button class="btn btn-sm btn-primary" onclick="confirmBold(${p.id})">Confirmar Bold</button>`:''}
+			${canConc && p.estado !== 'conciliado' && Number(p.conciliado) !== 1
+				? `<button class="btn btn-sm btn-secondary" onclick="conciliar(${p.id})">Conciliar</button>`
+				: ''}
+			${canBold && p.bold_payment_id && p.estado === 'pendiente'
+				? `<button class="btn btn-sm btn-primary" onclick="confirmBold(${p.id})">Confirmar Bold</button>`
+				: ''}
 		</td>
 		</tr>`).join('')||'<tr><td colspan="7" class="empty">Sin pagos</td></tr>';
 	}
@@ -114,12 +135,25 @@ $canConc = RolePermissions::can($currentUser['rol'], 'pagos', 'conciliar');
 		await ContaAPI.post('pagos/'+id+'/bold-confirm'); 
 		load(); 
 	}
+
+	function showOK(msg = "Pago Conciliado") {
+		const modal =document.getElementById('modalOK');
+		document.getElementById('modalOKmsg').innerHTML = msg;
+		modal.style.display = 'flex';
+		setTimeout(() => {
+			modal.style.display = 'none';
+		}, 3000);
+
+	}				
+
 	async function conciliar(id){
   		try{
 			const r=await ContaAPI.post('pagos/'+id+'/conciliar');
-			alert('Conciliado OK');
+			alert('Pago Conciliado');
 		}catch(e){
 			alert(e.message);
+		} finally {
+			load();
 		}
 	load();
 	}

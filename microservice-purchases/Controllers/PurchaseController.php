@@ -76,19 +76,18 @@ class PurchaseController extends Controller {
     }
     
     public function update(int $id): void {
+        $auth = AuthMiddleware::handle('compras', 'update');
+        if (!$this->model->findById($id)) Response::error('No encontrada.', 404);
 
-        AuthMiddleware::handle('compras','update'); 
-        
-        if(!$this->model->findById($id)){
-            Response::error('No encontrada.',404);
+        $d = $this->input();
+        if (isset($d['estado'])) {
+            try {
+                $this->model->updateStatus($id, $d['estado'], $auth['id'] ?? null);
+            } catch (Exception $e) {
+                Response::error($e->getMessage(), 400);
+            }
         }
-
-        $d=$this->input(); 
-        
-        if(isset($d['estado'])) {
-            $this->model->updateStatus($id,$d['estado']);
-        }
-        Response::success($this->model->findWithDetails($id),'Actualizada.');
+        Response::success($this->model->findWithDetails($id), 'Actualizada.');
     }
     
     public function cancel(int $id): void {
