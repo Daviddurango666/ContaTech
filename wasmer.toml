@@ -1,0 +1,9 @@
+[package]
+name = "daviddurango666/contatech"
+version = "0.1.0"
+description = "Proyecto Contatech MVC con Microservicios en PHP"
+
+[[command]]
+name = "serve"
+runner = "wasi"
+main = "php"
