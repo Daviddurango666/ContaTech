@@ -1,11 +1,18 @@
-name: "contatech"
-package: "php/php"
-
-command:
-  name: "serve"
-  runner: "wasi"
-  main: "php"
-  args: ["-S", "0.0.0.0:$PORT", "index.php"]
-
-scaling:
-  mode: "single_concurrency"
+annotations:
+  anybuild.run/config:
+    name: out
+    php_architecture: 64-bit
+    php_version: '8.3'
+    phpix: true
+  anybuild.run/provider: php
+  anybuild.run/version: 0.33.2
+  wasmer.io/version: 7.5.0
+app_id: da_2J7IAtxUdgJ3
+enableDatabase: true
+enable_email: true
+env:
+  PHPIX_PHP_THREADS: '4'
+kind: wasmer.io/App.v0
+name: contatech
+owner: daviddurango666
+package: sha256:41dc5d2b2731f4348d45f5caf41b4b586e3176768efaa610f32d1a954155d698
