@@ -3,7 +3,7 @@
  * ContaTech - Landing / punto de entrada
  */
 $appCfg = require __DIR__ . '/config/app.php';
-$base = rtrim($appCfg['base_url'] ?? '/ContaTech1', '/');
+// $base = rtrim($appCfg['base_url'] ?? '/ContaTech1', '/');
 
 // Si ya hay sesión válida → dashboard
 $token = $_COOKIE['contatech_token'] ?? null;
@@ -18,8 +18,8 @@ if ($token) {
     }
 }
 
-$loginUrl = $base . '/views/auth/login.php';
-$registerUrl = $base . '/views/auth/register.php';
+$loginUrl =  '/views/auth/login.php';
+$registerUrl = '/views/auth/register.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -261,7 +261,7 @@ $registerUrl = $base . '/views/auth/register.php';
 <body>
   <nav class="nav">
     <div class="logo">
-      <img src="<?= $base ?>/public/assets/img/favicon_io/android-chrome-512x512.png" 
+      <img src="/public/assets/img/favicon_io/android-chrome-512x512.png" 
            alt="ContaTech" width="40" height="40">
       ContaTech
     </div>
