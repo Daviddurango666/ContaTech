@@ -43,7 +43,7 @@ class PaymentModel extends Model {
                                 JOIN metodos_pago m ON m.id=p.metodo_pago_id 
                                 LEFT JOIN facturas f ON f.id=p.factura_id 
                                 ORDER BY 
-                                p.created_at DESC
+                                p.id DESC
                             ")->fetchAll();
     }
 
@@ -55,59 +55,73 @@ class PaymentModel extends Model {
                             ")->fetchAll(); 
     }
 
-    public function conciliate(int $id): array {
-
-        $p=$this->findById($id); 
+    public function conciliate(int $id): array
+    {
+        $p = $this->findById($id);
         
-        if(!$p) {
+        if (!$p) {
             throw new Exception('Pago no encontrado');
-        
         }
-        
-        $montoPago=(float)$p['monto']; 
-        $montoFac=(float)($p['monto_factura']??0);
 
-        
-        if($p['factura_id']&&$montoFac<=0){ 
-            $f=$this->db->prepare("
-                                    SELECT total FROM facturas 
-                                    WHERE 
-                                    id=?
-                                "); 
-            
-            $f->execute([$p['factura_id']]); 
-            $row=$f->fetch(); 
-            $montoFac=$row?(float)$row['total']:0; 
+        // Si ya está conciliado, no hacemos nada
+        if (($p['conciliado'] ?? 0) === 1) {
+            return [
+                'conciliado' => true,
+                'mensaje' => 'El pago ya estaba conciliado'
+            ];
         }
-        
-        $ok=abs($montoPago-$montoFac)<0.01;
-        
-        if($ok){
+
+        // =====================================================
+        // 1. Actualizar el pago a CONCILIADO
+        // =====================================================
+        $stmt = $this->db->prepare("
+            UPDATE pagos 
+            SET estado = 'conciliado'
+            WHERE id = ?
+        ");
+        $stmt->execute([$id]);
+
+        // =====================================================
+        // 2. Generar el INGRESO
+        // =====================================================
+        $ordenId     = $p['orden_id'] ?? null;
+        $monto       = (float)($p['monto'] ?? 0);
+        $numeroOrden = $p['numero_orden'] ?? $ordenId ?? $id;
+        $usuarioId   = $p['usuario_id'] ?? ($_SESSION['user_id'] ?? null);
+
+        if ($monto > 0) {
             $this->db->prepare("
-                                UPDATE pagos 
-                                SET 
-                                estado='conciliado',
-                                conciliado=1,
-                                monto_factura=? 
-                                WHERE 
-                                id=?
-                            ")->execute([$montoFac,$id]);
-
-            if($p['orden_id']) {
-                $this->db->prepare("
-                                    UPDATE ordenes_venta 
-                                    SET 
-                                    estado='cobrado' 
-                                    WHERE 
-                                    id=?
-                                ")->execute([$p['orden_id']]);
-            }
+                INSERT INTO movimientos
+                (tipo, descripcion, monto, categoria, fecha, usuario_id, referencia)
+                VALUES
+                ('ingreso', ?, ?, 'ventas', CURDATE(), ?, ?)
+            ")->execute([
+                'Ingreso por venta - Orden ' . $numeroOrden,
+                $monto,
+                $usuarioId,
+                'ING-PAGO-' . $id
+            ]);
         }
+
+        // =====================================================
+        // 3. (Opcional pero recomendado) Actualizar la factura/orden a COBRADA
+        // =====================================================
+        if ($ordenId) {
+            // Ajusta el nombre de la tabla y el campo según tu estructura
+            $this->db->prepare("
+                UPDATE ordenes_venta 
+                SET estado = 'cobrado' 
+                WHERE id = ?
+            ")->execute([$ordenId]);
+            
+            // Si usas tabla de facturas separada:
+            // $this->db->prepare("UPDATE facturas SET estado = 'cobrada' WHERE orden_id = ?")->execute([$ordenId]);
+        }
+
         return [
-            'conciliado'=>$ok,
-            'monto_pago'=>$montoPago,
-            'monto_factura'=>$montoFac,
-            'diferencia'=>round($montoPago-$montoFac,2)
+            'conciliado' => true,
+            'ingreso_generado' => true,
+            'monto' => $monto
         ];
     }
 }

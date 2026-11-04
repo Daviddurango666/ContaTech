@@ -47,6 +47,42 @@ class AuthController extends Controller {
         );
     }
 
+    public function register(): void {
+        $d=$this->input(); 
+        
+        $nombre=trim($d['nombre']??''); 
+        $email=trim($d['email']??''); 
+        $usuario=trim($d['usuario']??''); 
+        $password=$d['password']??'';
+        
+        if($nombre===''||$email===''||$usuario===''||$password==='') {
+            Response::error('Nombre, email, usuario y contraseña son obligatorios.',422);
+        }
+        
+        if(strlen($password)<6){
+            Response::error('La contraseña debe tener al menos 6 caracteres.',422);
+        }
+
+        if($this->users->findByEmail($email)){
+            Response::error('El email ya está registrado.',422);
+        }
+
+        if($this->users->findByLogin($usuario)){
+            Response::error('El usuario ya está registrado.',422);
+        }
+
+        $userId = $this->users->create([
+            'nombre'=>$nombre,
+            'usuario'=>$usuario,
+            'email'=>$email,
+            'password'=>$password,
+            'rol'=>'Administrador',
+            'activo'=>1
+        ]);
+
+        Response::success(['id'=>$userId], 'Usuario registrado exitosamente.');
+    }
+
     public function logout(): void { 
         Response::success(null,'Sesión cerrada'); 
     }

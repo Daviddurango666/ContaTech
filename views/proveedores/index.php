@@ -135,10 +135,15 @@ $canDelete=RolePermissions::can($currentUser['rol'],'proveedores','delete');
             }
                 
             async function del(id){
-                if(!confirm('¿Desactivar?')){
-                    return;
-                    await ContaAPI.post('proveedores/'+id+'/delete');
-                    load();
+                if(!confirm('¿Desactivar Proveedor?')){
+                    try {
+                        await ContaAPI.post('proveedores/'+id+'/delete');
+                        alert('Proveedor desactivado');
+                        await load();
+                    } catch (e) {
+                        alert(e.message);
+
+                    }
                 }
             }
         load();

@@ -104,50 +104,93 @@ class PurchaseModel extends Model {
         return $o;
     }
     
-    public function updateStatus(int $id, string $estado): bool {
-        if(!in_array($estado,['solicitado','facturado_proveedor','entregado','anulado'],true)){ 
+    public function updateStatus(int $id, string $estado, ?int $usuarioId = null): bool {
+        if (!in_array($estado, ['solicitado', 'facturado_proveedor', 'entregado', 'anulado'], true)) {
             return false;
         }
 
-        
+        $actual = $this->findById($id);
+        if (!$actual) {
+            return false;
+        }
+
+        // Evitar procesar dos veces una OC ya entregada
+        if ($estado === 'entregado' && $actual['estado'] === 'entregado') {
+            return true;
+        }
+
         $this->db->beginTransaction();
-        
-        try{
+
+        try {
             $this->db->prepare("
-                                UPDATE 
-                                ordenes_compra 
-                                SET 
-                                estado=? 
-                                WHERE 
-                                id=?
-                            ")->execute([$estado,$id]);
+                UPDATE ordenes_compra
+                SET estado = ?
+                WHERE id = ?
+            ")->execute([$estado, $id]);
 
-            if($estado==='entregado'){
+            if ($estado === 'entregado') {
+                $o = $this->findWithDetails($id);
 
-                $o=$this->findWithDetails($id);
-                
-                $st=$this->db->prepare("
-                                        UPDATE 
-                                        productos 
-                                        SET 
-                                        stock=stock+? 
-                                        WHERE 
-                                        id=?
-                                    ");
-                
-                foreach($o['detalle'] as $it) {
+                if (!$o || empty($o['detalle'])) {
+                    throw new Exception('OC sin detalle');
+                }
+
+                // Sube stock y actualiza costo unitario del producto
+                $st = $this->db->prepare("
+                    UPDATE productos
+                    SET stock = stock + ?,
+                        costo = ?
+                    WHERE id = ?
+                ");
+
+                $totalCosto = 0.0;
+
+                foreach ($o['detalle'] as $it) {
+                    $cant  = (int)$it['cantidad'];
+                    $costo = (float)$it['costo_unitario'];
+                    $totalCosto += $cant * $costo;
+
                     $st->execute([
-                        $it['cantidad'],
+                        $cant,
+                        $costo,
                         $it['producto_id']
                     ]);
                 }
+
+                // Registrar EGRESO en movimientos (solo una vez por OC)
+                if ($totalCosto > 0) {
+                    $ref = 'EGRESO-OC-' . $id;
+
+                    $existe = $this->db->prepare("
+                        SELECT id FROM movimientos
+                        WHERE referencia = ?
+                        LIMIT 1
+                    ");
+                    $existe->execute([$ref]);
+
+                    if (!$existe->fetch()) {
+                        $this->db->prepare("
+                            INSERT INTO movimientos
+                            (tipo, descripcion, monto, categoria, fecha, usuario_id, referencia)
+                            VALUES
+                            ('egreso', ?, ?, 'compras', ?, ?, ?)
+                        ")->execute([
+                            'Compra mercancía ' . ($o['numero'] ?? ('OC-' . $id)),
+                            $totalCosto,
+                            date('Y-m-d'),
+                            $usuarioId ?? $o['usuario_id'] ?? null,
+                            $ref,
+                        ]);
+                    }
+                }
             }
 
-            $this->db->commit(); 
+            $this->db->commit();
             return true;
-        }catch(Exception $e){ 
-            $this->db->rollBack(); 
-            throw $e; 
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
         }
     }
 }

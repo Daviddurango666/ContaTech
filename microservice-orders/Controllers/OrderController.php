@@ -128,13 +128,12 @@ class OrderController extends Controller {
                 $this->orders->updateStatus($ordenId, 'facturado');
             }
 
-            // Egreso por costo de mercancía (opcional)
+            // Egreso por costo de mercancía (COGS)
             $costo = 0;
             foreach ($orden['detalle'] as $it) {
-                // Si traes costo en el detalle, o lo consultas del producto
                 $st = $this->db->prepare("SELECT costo FROM productos WHERE id = ?");
                 $st->execute([$it['producto_id']]);
-                $row = $st->fetch();
+                $row = $st->fetch(PDO::FETCH_ASSOC);
                 $costo += ((float)($row['costo'] ?? 0)) * (int)$it['cantidad'];
             }
 
@@ -145,13 +144,15 @@ class OrderController extends Controller {
                     VALUES
                     ('egreso', ?, ?, 'costo_ventas', ?, ?, ?)
                 ")->execute([
-                    'Costo venta orden ' . ($orden['numero'] ?? $ordenId),
+                    'Costo de mercancía - Orden ' . ($orden['numero'] ?? $ordenId),
                     $costo,
                     date('Y-m-d'),
                     $auth['id'],
                     'COSTO-OV-' . $ordenId,
                 ]);
             }
+            // ingreso (opcional)
+            
 
             Response::success([
                 'orden' => $this->orders->findWithDetails($ordenId),
