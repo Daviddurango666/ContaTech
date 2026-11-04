@@ -4,7 +4,7 @@ $appCfg = require __DIR__ . '/../../config/app.php';
 
 if (!empty($_COOKIE['contatech_token'])) {
 	try { 
-        require_once __DIR__.'/../core/JWT.php'; 
+        require_once __DIR__.'/../../core/JWT.php'; 
         JWT::decode($_COOKIE['contatech_token']);
 		header('Location: /views/dashboard/index.php'); 
         exit;
