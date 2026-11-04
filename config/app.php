@@ -3,7 +3,7 @@ return [
     'app_name'    => 'ContaTech',
     'app_version' => '2.0.0',
     'base_url'    => 'contatech.wasmer.app',
-    'api_url'     => '/ContaTech1/api',
+    'api_url'     => 'contatech.wasmer.app/api',
     'timezone'    => 'America/Bogota',
     'jwt_secret'  => 'ContaTech_JWT_Secret_Key_2026_ChangeInProduction_X9kL2mP',
     'jwt_issuer'  => 'ContaTech',
