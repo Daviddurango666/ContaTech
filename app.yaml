@@ -1,7 +1,5 @@
-apiVersion: wasmer.io/v1
-kind: wasmer.io/App.v1
 name: "contatech"
-package: "daviddurango666/contatech"
+package: "php/php"
 
 command:
   name: "serve"
