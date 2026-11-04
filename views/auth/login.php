@@ -1,12 +1,12 @@
 <?php
 $appCfg = require __DIR__ . '/../../config/app.php'; 
-$base = $appCfg['base_url'];
+// $base = $appCfg['base_url'];
 
 if (!empty($_COOKIE['contatech_token'])) {
 	try { 
-        require_once __DIR__.'/../../core/JWT.php'; 
+        require_once __DIR__.'/../core/JWT.php'; 
         JWT::decode($_COOKIE['contatech_token']);
-		header('Location: '.$base.'/views/dashboard/index.php'); 
+		header('Location: /views/dashboard/index.php'); 
         exit;
 	} catch (Exception $e) {}
 }
@@ -17,10 +17,10 @@ if (!empty($_COOKIE['contatech_token'])) {
     <head>
         <meta charset="UTF-8">
         <title>Iniciar sesión | ContaTech</title>
-        <link rel="stylesheet" href="<?= $base ?>/public/assets/css/login.css">
-        <link rel="stylesheet" href="<?= $base ?>/public/assets/css/app.css">
-        <link rel="icon" href="<?= $base ?>/public/assets/img/favicon_io/favicon.ico">
-        <script src="<?= $base ?>/public/assets/js/api.js"></script>
+        <link rel="stylesheet" href="/public/assets/css/login.css">
+        <link rel="stylesheet" href="/public/assets/css/app.css">
+        <link rel="icon" href="/public/assets/img/favicon_io/favicon.ico">
+        <script src="/public/assets/js/api.js"></script>
         <style>
             .login-box 
             .error{
@@ -75,7 +75,7 @@ if (!empty($_COOKIE['contatech_token'])) {
 
                 ContaAPI.setSession(res.data.token, res.data.user);
                 
-                window.location.href='<?= $base ?>/views/dashboard/index.php';
+                window.location.href='/views/dashboard/index.php';
 
             } catch(ex){ 
                 err.textContent=ex.message; 
