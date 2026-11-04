@@ -1,0 +1,12 @@
+name: "contatech"
+package: "daviddurango666/contatech"
+
+command:
+  name: "serve"
+  runner: "wasi"
+  main: "php"
+  # Inicia el servidor PHP apuntando a la raíz del proyecto y usando el puerto asignado
+  args: ["-S", "0.0.0.0:$PORT", "index.php"]
+
+scaling:
+  mode: "single_concurrency"
